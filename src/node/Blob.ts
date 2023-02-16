@@ -200,7 +200,7 @@ export class Blob {
           }); return
         }
 
-        controller.enqueue(value)
+        controller.enqueue(value as any)
       },
 
       async cancel() {

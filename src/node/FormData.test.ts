@@ -97,7 +97,6 @@ test('Third argument overrides File.name even if it was set to null', t => {
   const file = new File(['Some content'], 'file.txt')
   const form = new FormData()
 
-  // @ts-expect-error
   form.set('file', file, null)
 
   t.is((form.get('file') as File).name, 'null')

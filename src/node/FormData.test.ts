@@ -2,13 +2,11 @@
 
 // import test from 'ava'
 
-import sinon from 'sinon'
+import {spy} from 'sinon'
 
 import {Blob} from './Blob'
 import {File} from './File'
 import {FormData} from './FormData'
-
-const {spy} = sinon
 
 describe('FormData', function () {
   // test('Recognizes FormData instances', t => {

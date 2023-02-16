@@ -264,11 +264,11 @@ export default [
       },
     ],
   }),
-  browserConfig({
-    name      : 'TestUtils',
-    input     : ['src/browser/index.ts'],
-    outputDir : 'dist/bundle',
-    outputFile: 'browser.js',
-  }),
-  browserTestsConfig,
+  // browserConfig({
+  //   name      : 'TestUtils',
+  //   input     : ['src/browser/index.ts'],
+  //   outputDir : 'dist/bundle',
+  //   outputFile: 'browser.js',
+  // }),
+  // browserTestsConfig,
 ]

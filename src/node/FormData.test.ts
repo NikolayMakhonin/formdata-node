@@ -7,7 +7,6 @@ import sinon from 'sinon'
 import {Blob} from './Blob'
 import {File} from './File'
 import {FormData} from './FormData'
-import { spawn } from 'child_process'
 
 const {spy} = sinon
 
@@ -244,13 +243,21 @@ describe('FormData', function () {
   //     t.deepEqual(form.getAll('field'), ['one', 'two'])
   //   },
   // )
-  //
+  it('.append() appends to an existent field even if it was created with .set()', function () {
+    const form = new FormData()
+    form.set('field', 'one')
+    form.append('field', 'two')
+    expect(form.getAll('field')).toEqual(['one', 'two'])
+  })
   // test('.has() returns false for non-existent field', t => {
   //   const form = new FormData()
   //
   //   t.false(form.has('field'))
   // })
-  //
+  it('.has() returns false for non-existent field', function () {
+    const form = new FormData()
+    expect(form.has('field')).toBe(false)
+  })
   // test('.delete() removes a field', t => {
   //   const form = new FormData()
   //
@@ -262,13 +269,22 @@ describe('FormData', function () {
   //
   //   t.false(form.has('field'))
   // })
-  //
+  it('.delete() removes a field', function () {
+    const form = new FormData()
+    form.set('field', 'Some data')
+    expect(form.has('field')).toBe(true)
+    form.delete('field')
+    expect(form.has('field')).toBe(false)
+  })
   // test('.get() returns null for non-existent field', t => {
   //   const form = new FormData()
   //
   //   t.is(form.get('field'), null)
   // })
-  //
+  it('.get() returns null for non-existent field', function () {
+    const form = new FormData()
+    expect(form.get('field')).toBe(null)
+  })
   // test('.get() returns number values as string', t => {
   //   const form = new FormData()
   //
@@ -276,7 +292,11 @@ describe('FormData', function () {
   //
   //   t.is(form.get('field'), '42')
   // })
-  //
+  it('.get() returns number values as string', function () {
+    const form = new FormData()
+    form.set('field', 42)
+    expect(form.get('field')).toBe('42')
+  })
   // test('.get() returns only first value from the field', t => {
   //   const form = new FormData()
   //
@@ -285,7 +305,12 @@ describe('FormData', function () {
   //
   //   t.is(form.get('field'), 'one')
   // })
-  //
+  it('.get() returns only first value from the field', function () {
+    const form = new FormData()
+    form.append('field', 'one')
+    form.append('field', 'two')
+    expect(form.get('field')).toBe('one')
+  })
   // test('.get() returns Blob as a File', t => {
   //   const blob = new Blob(['Some text'])
   //   const form = new FormData()
@@ -294,7 +319,12 @@ describe('FormData', function () {
   //
   //   t.true(form.get('blob') instanceof File)
   // })
-  //
+  it('.get() returns Blob as a File', function () {
+    const blob = new Blob(['Some text'])
+    const form = new FormData()
+    form.set('blob', blob)
+    expect(form.get('blob')).toBeInstanceOf(File)
+  })
   // test('.get() returns File as-is', t => {
   //   const file = new File(['Some text'], 'file.txt')
   //   const form = new FormData()
@@ -303,7 +333,12 @@ describe('FormData', function () {
   //
   //   t.true(form.get('file') instanceof File)
   // })
-  //
+  it('.get() returns File as-is', function () {
+    const file = new File(['Some text'], 'file.txt')
+    const form = new FormData()
+    form.set('file', file)
+    expect(form.get('file')).toBeInstanceOf(File)
+  })
   // test('.get() returns the same File that was added to FormData', t => {
   //   const file = new File(['Some text'], 'file.txt')
   //   const form = new FormData()
@@ -312,13 +347,21 @@ describe('FormData', function () {
   //
   //   t.is(form.get('file'), file)
   // })
-  //
+  it('.get() returns the same File that was added to FormData', function () {
+    const file = new File(['Some text'], 'file.txt')
+    const form = new FormData()
+    form.set('file', file)
+    expect(form.get('file')).toBe(file)
+  })
   // test('.getAll() returns an empty array for non-existent field', t => {
   //   const form = new FormData()
   //
   //   t.deepEqual(form.getAll('field'), [])
   // })
-  //
+  it('.getAll() returns an empty array for non-existent field', function () {
+    const form = new FormData()
+    expect(form.getAll('field')).toEqual([])
+  })
   // test('.getAll() returns all values associated with given key', t => {
   //   const expected = ['one', 'two', 'three']
   //   const form = new FormData()
@@ -332,7 +375,16 @@ describe('FormData', function () {
   //   t.is(actual.length, 3)
   //   t.deepEqual(actual, expected)
   // })
-  //
+  it('.getAll() returns all values associated with given key', function () {
+    const expected = ['one', 'two', 'three']
+    const form = new FormData()
+    form.append('field', expected[0])
+    form.append('field', expected[1])
+    form.append('field', expected[2])
+    const actual = form.getAll('field')
+    expect(actual.length).toBe(3)
+    expect(actual).toEqual(expected)
+  })
   // test(
   //   '.forEach() callback should not be called when FormData has no fields',
   //
@@ -346,7 +398,12 @@ describe('FormData', function () {
   //     t.false(cb.called)
   //   },
   // )
-  //
+  it('.forEach() callback should not be called when FormData has no fields', function () {
+    const cb = spy()
+    const fd = new FormData()
+    fd.forEach(cb)
+    expect(cb.called).toBe(false)
+  })
   // test(
   //   '.forEach() callback should be called with the nullish context by default',
   //   t => {
@@ -361,7 +418,13 @@ describe('FormData', function () {
   //     t.is(cb.firstCall.thisValue, undefined)
   //   },
   // )
-  //
+  it('.forEach() callback should be called with the nullish context by default', function () {
+    const cb = spy()
+    const form = new FormData()
+    form.set('name', 'John Doe')
+    form.forEach(cb)
+    expect(cb.firstCall.thisValue).toBe(undefined)
+  })
   // test('.forEach() callback should be called with the specified context', t => {
   //   const cb = spy()
   //
@@ -376,7 +439,15 @@ describe('FormData', function () {
   //   t.true(cb.firstCall.thisValue instanceof Map)
   //   t.is(cb.firstCall.thisValue, ctx)
   // })
-  //
+  it('.forEach() callback should be called with the specified context', function () {
+    const cb = spy()
+    const ctx = new Map()
+    const form = new FormData()
+    form.set('name', 'John Doe')
+    form.forEach(cb, ctx)
+    expect(cb.firstCall.thisValue instanceof Map).toBe(true)
+    expect(cb.firstCall.thisValue).toBe(ctx)
+  })
   // test(
   //   '.forEach() callback should be called with value, name and FormData itself',
   //   t => {
@@ -395,7 +466,16 @@ describe('FormData', function () {
   //     t.is(instance, form)
   //   },
   // )
-  //
+  it('.forEach() callback should be called with value, name and FormData itself', function () {
+    const cb = spy()
+    const form = new FormData()
+    form.set('name', 'John Doe')
+    form.forEach(cb)
+    const [value, key, instance] = cb.firstCall.args
+    expect(value).toBe('John Doe')
+    expect(key).toBe('name')
+    expect(instance).toBe(form)
+  })
   // test('.forEach() callback should be called once on each filed', t => {
   //   const cb = spy()
   //
@@ -409,7 +489,15 @@ describe('FormData', function () {
   //
   //   t.true(cb.calledThrice)
   // })
-  //
+  it('.forEach() callback should be called once on each filed', function () {
+    const cb = spy()
+    const form = new FormData()
+    form.set('first', 'value')
+    form.set('second', 42)
+    form.set('third', [1, 2, 3])
+    form.forEach(cb)
+    expect(cb.calledThrice).toBe(true)
+  })
   // test(".values() is done on the first call when there's no data", t => {
   //   const form = new FormData()
   //
@@ -420,7 +508,14 @@ describe('FormData', function () {
   //     value: undefined,
   //   })
   // })
-  //
+  it(".values() is done on the first call when there's no data", function () {
+    const form = new FormData()
+    const curr = form.values().next()
+    expect(curr).toEqual({
+      done : true,
+      value: undefined,
+    })
+  })
   // test('.values() Returns the first value on the first call', t => {
   //   const form = new FormData()
   //
@@ -435,7 +530,17 @@ describe('FormData', function () {
   //     value: 'value',
   //   })
   // })
-  //
+  it('.values() Returns the first value on the first call', function () {
+    const form = new FormData()
+    form.set('first', 'value')
+    form.set('second', 42)
+    form.set('third', [1, 2, 3])
+    const curr = form.values().next()
+    expect(curr).toEqual({
+      done : false,
+      value: 'value',
+    })
+  })
   // test('.value() yields every value from FormData', t => {
   //   const form = new FormData()
   //
@@ -445,7 +550,13 @@ describe('FormData', function () {
   //
   //   t.deepEqual([...form.values()], ['value', '42', '1,2,3'])
   // })
-  //
+  it('.value() yields every value from FormData', function () {
+    const form = new FormData()
+    form.set('first', 'value')
+    form.set('second', 42)
+    form.set('third', [1, 2, 3])
+    expect([...form.values()]).toEqual(['value', '42', '1,2,3'])
+  })
   // test(".keys() is done on the first call when there's no data", t => {
   //   const form = new FormData()
   //
@@ -456,7 +567,14 @@ describe('FormData', function () {
   //     value: undefined,
   //   })
   // })
-  //
+  it(".keys() is done on the first call when there's no data", function () {
+    const form = new FormData()
+    const curr = form.keys().next()
+    expect(curr).toEqual({
+      done : true,
+      value: undefined,
+    })
+  })
   // test('.keys() Returns the first value on the first call', t => {
   //   const form = new FormData()
   //
@@ -471,7 +589,17 @@ describe('FormData', function () {
   //     value: 'first',
   //   })
   // })
-  //
+  it('.keys() Returns the first value on the first call', function () {
+    const form = new FormData()
+    form.set('first', 'value')
+    form.set('second', 42)
+    form.set('third', [1, 2, 3])
+    const curr = form.keys().next()
+    expect(curr).toEqual({
+      done : false,
+      value: 'first',
+    })
+  })
   // test('.keys() yields every key from FormData', t => {
   //   const form = new FormData()
   //
@@ -481,11 +609,19 @@ describe('FormData', function () {
   //
   //   t.deepEqual([...form.keys()], ['first', 'second', 'third'])
   // })
-  //
+  it('.keys() yields every key from FormData', function () {
+    const form = new FormData()
+    form.set('first', 'value')
+    form.set('second', 42)
+    form.set('third', [1, 2, 3])
+    expect([...form.keys()]).toEqual(['first', 'second', 'third'])
+  })
   // test('.toString() returns a proper string', t => {
   //   t.is(new FormData().toString(), '[object FormData]')
   // })
-  //
+  it('.toString() returns a proper string', function () {
+    expect(new FormData().toString()).toBe('[object FormData]')
+  })
   // test('.set() throws TypeError when called with less than 2 arguments', t => {
   //   const form = new FormData()
   //
@@ -498,7 +634,12 @@ describe('FormData', function () {
   //       + '2 arguments required, but only 1 present.',
   //   })
   // })
-  //
+  it('.set() throws TypeError when called with less than 2 arguments', function () {
+    const form = new FormData()
+    // @ts-expect-error
+    const trap = () => form.set('field')
+    expect(() => trap()).toThrow(TypeError)
+  })
   // test(
   //   '.set() throws TypeError when the filename argument is present, '
   //     + 'but the value is not a File',
@@ -515,7 +656,11 @@ describe('FormData', function () {
   //     })
   //   },
   // )
-  //
+  it('.set() throws TypeError when the filename argument is present, but the value is not a File', function () {
+    const form = new FormData()
+    const trap = () => form.set('field', 'Some value', 'field.txt')
+    expect(() => trap()).toThrow(TypeError)
+  })
   // test('.append() throws TypeError when called with less than 2 arguments', t => {
   //   const form = new FormData()
   //
@@ -528,7 +673,12 @@ describe('FormData', function () {
   //       + '2 arguments required, but only 1 present.',
   //   })
   // })
-  //
+  it('.append() throws TypeError when called with less than 2 arguments', function () {
+    const form = new FormData()
+    // @ts-expect-error
+    const trap = () => form.append('field')
+    expect(() => trap()).toThrow(TypeError)
+  })
   // test(
   //   '.append() throws TypeError when the filename argument is present, '
   //     + 'but the value is not a File',
@@ -545,4 +695,9 @@ describe('FormData', function () {
   //     })
   //   },
   // )
+  it('.append() throws TypeError when the filename argument is present, but the value is not a File', function () {
+    const form = new FormData()
+    const trap = () => form.append('field', 'Some value', 'field.txt')
+    expect(() => trap()).toThrow(TypeError)
+  })
 })

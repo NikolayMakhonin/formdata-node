@@ -1,7 +1,7 @@
-import {isFunction} from "./isFunction.js"
-import {isBlob} from "./isBlob.js"
-import {isFile} from "./isFile.js"
-import {File} from "./File.js"
+import {isFunction} from './isFunction'
+import {isBlob} from './isBlob'
+import {isFile} from './isFile'
+import {File} from './File'
 
 /**
  * A `string` or `File` that represents a single value from a set of `FormData` key-value pairs.
@@ -69,7 +69,7 @@ export class FormData {
 
     return Boolean(
       isFunction(val.constructor)
-        && val[Symbol.toStringTag] === "FormData"
+        && val[Symbol.toStringTag] === 'FormData'
         && isFunction(val.append)
         && isFunction(val.set)
         && isFunction(val.get)
@@ -80,7 +80,7 @@ export class FormData {
         && isFunction(val.values)
         && isFunction(val.keys)
         && isFunction(val[Symbol.iterator])
-        && isFunction(val.forEach)
+        && isFunction(val.forEach),
     )
   }
 
@@ -89,15 +89,15 @@ export class FormData {
     rawValue,
     append,
     fileName,
-    argsLength
+    argsLength,
   }: FormDataSetFieldOptions): void {
-    const methodName = append ? "append" : "set"
+    const methodName = append ? 'append' : 'set'
 
     // FormData required at least 2 arguments to be set.
     if (argsLength < 2) {
       throw new TypeError(
         `Failed to execute '${methodName}' on 'FormData': `
-          + `2 arguments required, but only ${argsLength} present.`
+          + `2 arguments required, but only ${argsLength} present.`,
       )
     }
 
@@ -111,20 +111,23 @@ export class FormData {
       value = fileName === undefined
         ? rawValue // if there's no fileName, let the value be rawValue
         : new File([rawValue], fileName, { // otherwise, create new File with given fileName
-          type: rawValue.type,
-          lastModified: rawValue.lastModified
+          type        : rawValue.type,
+          lastModified: rawValue.lastModified,
         })
-    } else if (isBlob(rawValue)) {
+    }
+    else if (isBlob(rawValue)) {
       // Use "blob" as default filename if the 3rd argument is not present
-      value = new File([rawValue], fileName === undefined ? "blob" : fileName, {
-        type: rawValue.type
+      value = new File([rawValue], fileName === undefined ? 'blob' : fileName, {
+        type: rawValue.type,
       })
-    } else if (fileName) { // If value is not a File or Blob, but the filename is present, throw following error:
+    }
+    else if (fileName) { // If value is not a File or Blob, but the filename is present, throw following error:
       throw new TypeError(
         `Failed to execute '${methodName}' on 'FormData': `
-          + "parameter 2 is not of type 'Blob'."
+          + "parameter 2 is not of type 'Blob'.",
       )
-    } else {
+    }
+    else {
       // A non-file entries must be converted to string
       value = String(rawValue)
     }
@@ -162,9 +165,9 @@ export class FormData {
     this.#setEntry({
       name,
       fileName,
-      append: true,
-      rawValue: value,
-      argsLength: arguments.length
+      append    : true,
+      rawValue  : value,
+      argsLength: arguments.length,
     })
   }
 
@@ -182,9 +185,9 @@ export class FormData {
     this.#setEntry({
       name,
       fileName,
-      append: false,
-      rawValue: value,
-      argsLength: arguments.length
+      append    : false,
+      rawValue  : value,
+      argsLength: arguments.length,
     })
   }
 
@@ -247,7 +250,7 @@ export class FormData {
    * Returns an [`iterator`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols) allowing to go through all keys contained in this `FormData` object.
    * Each key is a `string`.
    */
-  * keys(): Generator<string> {
+  *keys(): Generator<string> {
     for (const key of this.#entries.keys()) {
       yield key
     }
@@ -257,7 +260,7 @@ export class FormData {
    * Returns an [`iterator`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols) allowing to go through the `FormData` key/value pairs.
    * The key of each pair is a string; the value is a [`FormDataValue`](https://developer.mozilla.org/en-US/docs/Web/API/FormDataEntryValue).
    */
-  * entries(): Generator<[string, FormDataEntryValue]> {
+  *entries(): Generator<[string, FormDataEntryValue]> {
     for (const name of this.keys()) {
       const values = this.getAll(name)
 
@@ -272,7 +275,7 @@ export class FormData {
    * Returns an [`iterator`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols) allowing to go through all values contained in this object `FormData` object.
    * Each value is a [`FormDataValue`](https://developer.mozilla.org/en-US/docs/Web/API/FormDataEntryValue).
    */
-  * values(): Generator<FormDataEntryValue> {
+  *values(): Generator<FormDataEntryValue> {
     for (const [, value] of this) {
       yield value
     }
@@ -291,7 +294,7 @@ export class FormData {
   forEach(
     callback: (value: FormDataEntryValue, key: string, form: FormData) => void,
 
-    thisArg?: unknown
+    thisArg?: unknown,
   ): void {
     for (const [name, value] of this) {
       callback.call(thisArg, value, name, this)
@@ -299,6 +302,6 @@ export class FormData {
   }
 
   get [Symbol.toStringTag](): string {
-    return "FormData"
+    return 'FormData'
   }
 }

@@ -1,13 +1,14 @@
 /*! Based on fetch-blob. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> & David Frank */
 
-import type {BlobPart} from "./BlobPart.js"
-import type {Blob, BlobLike} from "./Blob.js"
+import type {BlobPart} from './BlobPart'
+import type {Blob, BlobLike} from './Blob'
 
-import {isFunction} from "./isFunction.js"
+import {isFunction} from './isFunction'
 
 const CHUNK_SIZE = 65536 // 64 KiB (same size chrome slice theirs blob into Uint8array's)
 
-async function* clonePart(part: Uint8Array): AsyncGenerator<Uint8Array, void> {
+// eslint-disable-next-line @typescript-eslint/require-await
+async function *clonePart(part: Uint8Array): AsyncGenerator<Uint8Array, void> {
   const end = part.byteOffset + part.byteLength
   let position = part.byteOffset
   while (position !== end) {
@@ -24,15 +25,15 @@ async function* clonePart(part: Uint8Array): AsyncGenerator<Uint8Array, void> {
  * Consumes builtin Node.js Blob that does not have stream method.
  */
 /* c8 ignore start */
-async function* consumeNodeBlob(
-  blob: BlobLike
+async function *consumeNodeBlob(
+  blob: BlobLike,
 ): AsyncGenerator<Uint8Array, void> {
   let position = 0
   while (position !== blob.size) {
     const chunk = blob.slice(
       position,
 
-      Math.min(blob.size, position + CHUNK_SIZE)
+      Math.min(blob.size, position + CHUNK_SIZE),
     )
 
     const buffer = await chunk.arrayBuffer()
@@ -49,21 +50,24 @@ async function* consumeNodeBlob(
  *
  * @param parts blob parts from Blob class
  */
-export async function* consumeBlobParts(
+export async function *consumeBlobParts(
   parts: BlobPart[],
-  clone: boolean = false
+  clone: boolean = false,
 ): AsyncGenerator<Uint8Array, void> {
   for (const part of parts) {
     if (ArrayBuffer.isView(part)) {
       if (clone) {
         yield* clonePart(part)
-      } else {
+      }
+      else {
         yield part
       }
-    } else if (isFunction((part as Blob).stream)) {
+    }
+    else if (isFunction((part as Blob).stream)) {
       yield* (part as Blob).stream()
     /* c8 ignore start */
-    } else {
+    }
+    else {
       // Special case for an old Node.js Blob that have no stream() method.
       yield* consumeNodeBlob(part as BlobLike)
     }
@@ -71,11 +75,11 @@ export async function* consumeBlobParts(
   }
 }
 
-export function* sliceBlob(
+export function *sliceBlob(
   blobParts: BlobPart[],
   blobSize: number,
   start: number = 0,
-  end?: number
+  end?: number,
 ): Generator<BlobPart, void> {
   end ??= blobSize
 
@@ -101,13 +105,15 @@ export function* sliceBlob(
       // start & end position as we skip the unwanted parts
       relativeStart -= partSize
       relativeEnd -= partSize
-    } else {
+    }
+    else {
       let chunk: BlobPart
 
       if (ArrayBuffer.isView(part)) {
         chunk = part.subarray(relativeStart, Math.min(partSize, relativeEnd))
         added += chunk.byteLength
-      } else {
+      }
+      else {
         chunk = part.slice(relativeStart, Math.min(partSize, relativeEnd))
         added += chunk.size
       }

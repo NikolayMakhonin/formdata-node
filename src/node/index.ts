@@ -1,3 +1,3 @@
-export * from "./FormData.js"
-export * from "./Blob.js"
-export * from "./File.js"
+export * from './FormData'
+export * from './Blob'
+export * from './File'

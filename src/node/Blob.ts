@@ -1,11 +1,11 @@
 /*! Based on fetch-blob. MIT License. Jimmy Wärting <https://jimmy.warting.se/opensource> & David Frank */
 
-import {ReadableStream} from "web-streams-polyfill"
+import {ReadableStream} from 'web-streams-polyfill'
 
-import type {BlobPart} from "./BlobPart.js"
+import type {BlobPart} from './BlobPart'
 
-import {isFunction} from "./isFunction.js"
-import {consumeBlobParts, sliceBlob} from "./blobHelpers.js"
+import {isFunction} from './isFunction'
+import {consumeBlobParts, sliceBlob} from './blobHelpers'
 
 /**
  * Reflects minimal valid Blob for BlobParts.
@@ -46,7 +46,7 @@ export class Blob {
   /**
    * Returns the [`MIME type`](https://developer.mozilla.org/en-US/docs/Glossary/MIME_type) of the [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) or [`File`](https://developer.mozilla.org/en-US/docs/Web/API/File).
    */
-  readonly #type: string = ""
+  readonly #type: string = ''
 
   /**
    * Returns the size of the [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob) or [`File`](https://developer.mozilla.org/en-US/docs/Web/API/File) in bytes.
@@ -56,13 +56,13 @@ export class Blob {
   static [Symbol.hasInstance](value: unknown): value is Blob {
     return Boolean(
       value
-        && typeof value === "object"
+        && typeof value === 'object'
         && isFunction((value as Blob).constructor)
         && (
           isFunction((value as Blob).stream)
             || isFunction((value as Blob).arrayBuffer)
         )
-        && /^(Blob|File)$/.test((value as Blob)[Symbol.toStringTag])
+        && /^(Blob|File)$/.test((value as Blob)[Symbol.toStringTag]),
     )
   }
 
@@ -76,23 +76,23 @@ export class Blob {
   constructor(blobParts: BlobParts = [], options: BlobPropertyBag = {}) {
     options ??= {}
 
-    if (typeof blobParts !== "object" || blobParts === null) {
+    if (typeof blobParts !== 'object' || blobParts === null) {
       throw new TypeError(
         "Failed to construct 'Blob': "
-          + "The provided value cannot be converted to a sequence."
+          + 'The provided value cannot be converted to a sequence.',
       )
     }
 
     if (!isFunction(blobParts[Symbol.iterator])) {
       throw new TypeError(
         "Failed to construct 'Blob': "
-          + "The object must have a callable @@iterator property."
+          + 'The object must have a callable @@iterator property.',
       )
     }
 
-    if (typeof options !== "object" && !isFunction(options)) {
+    if (typeof options !== 'object' && !isFunction(options)) {
       throw new TypeError(
-        "Failed to construct 'Blob': parameter 2 cannot convert to dictionary."
+        "Failed to construct 'Blob': parameter 2 cannot convert to dictionary.",
       )
     }
 
@@ -104,13 +104,16 @@ export class Blob {
         part = new Uint8Array(raw.buffer.slice(
           raw.byteOffset,
 
-          raw.byteOffset + raw.byteLength
+          raw.byteOffset + raw.byteLength,
         ))
-      } else if (raw instanceof ArrayBuffer) {
+      }
+      else if (raw instanceof ArrayBuffer) {
         part = new Uint8Array(raw.slice(0))
-      } else if (raw instanceof Blob) {
+      }
+      else if (raw instanceof Blob) {
         part = raw
-      } else {
+      }
+      else {
         part = encoder.encode(String(raw))
       }
 
@@ -118,9 +121,9 @@ export class Blob {
       this.#parts.push(part)
     }
 
-    const type = options.type === undefined ? "" : String(options.type)
+    const type = options.type === undefined ? '' : String(options.type)
 
-    this.#type = /^[\x20-\x7E]*$/.test(type) ? type : ""
+    this.#type = /^[\x20-\x7E]*$/.test(type) ? type : ''
   }
 
   /**
@@ -146,7 +149,7 @@ export class Blob {
    */
   slice(start?: number, end?: number, contentType?: string): Blob {
     return new Blob(sliceBlob(this.#parts, this.size, start, end), {
-      type: contentType
+      type: contentType,
     })
   }
 
@@ -156,7 +159,7 @@ export class Blob {
   async text(): Promise<string> {
     const decoder = new TextDecoder()
 
-    let result = ""
+    let result = ''
     for await (const chunk of consumeBlobParts(this.#parts)) {
       result += decoder.decode(chunk, {stream: true})
     }
@@ -192,30 +195,32 @@ export class Blob {
         const {value, done} = await iterator.next()
 
         if (done) {
-          return queueMicrotask(() => controller.close())
+          queueMicrotask(() => {
+            controller.close()
+          }); return
         }
 
-        controller.enqueue(value!)
+        controller.enqueue(value)
       },
 
       async cancel() {
         await iterator.return()
-      }
+      },
     })
   }
 
   get [Symbol.toStringTag](): string {
-    return "Blob"
+    return 'Blob'
   }
 }
 
 // Not sure why, but these properties are enumerable.
 // Also fetch-blob defines "size", "type" and "slice" as such
 Object.defineProperties(Blob.prototype, {
-  type: {enumerable: true},
-  size: {enumerable: true},
-  slice: {enumerable: true},
-  stream: {enumerable: true},
-  text: {enumerable: true},
-  arrayBuffer: {enumerable: true}
+  type       : {enumerable: true},
+  size       : {enumerable: true},
+  slice      : {enumerable: true},
+  stream     : {enumerable: true},
+  text       : {enumerable: true},
+  arrayBuffer: {enumerable: true},
 })

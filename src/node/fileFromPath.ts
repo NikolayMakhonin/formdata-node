@@ -1,22 +1,22 @@
-import {statSync, createReadStream} from "node:fs"
-import {stat} from "node:fs/promises"
-import type {Stats} from "node:fs"
-import {basename} from "node:path"
+import {statSync, createReadStream} from 'node:fs'
+import {stat} from 'node:fs/promises'
+import type {Stats} from 'node:fs'
+import {basename} from 'node:path'
 
-import DOMException from "node-domexception"
+import DOMException from 'node-domexception'
 
-import type {FileLike, FilePropertyBag} from "./File.js"
-import {File} from "./File.js"
+import type {FileLike, FilePropertyBag} from './File'
+import {File} from './File'
 
-import isPlainObject from "./isPlainObject.js"
+import isPlainObject from './isPlainObject'
 
-export * from "./isFile.js"
+export * from './isFile'
 
-const MESSAGE = "The requested file could not be read, "
-  + "typically due to permission problems that have occurred after a reference "
-  + "to a file was acquired."
+const MESSAGE = 'The requested file could not be read, '
+  + 'typically due to permission problems that have occurred after a reference '
+  + 'to a file was acquired.'
 
-export type FileFromPathOptions = Omit<FilePropertyBag, "lastModified">
+export type FileFromPathOptions = Omit<FilePropertyBag, 'lastModified'>
 
 interface FileFromPathInput {
   path: string
@@ -34,7 +34,7 @@ interface FileFromPathInput {
  *
  * @api private
  */
-class FileFromPath implements Omit<FileLike, "type"> {
+class FileFromPath implements Omit<FileLike, 'type'> {
   #path: string
 
   #start: number
@@ -55,31 +55,31 @@ class FileFromPath implements Omit<FileLike, "type"> {
 
   slice(start: number, end: number): FileFromPath {
     return new FileFromPath({
-      path: this.#path,
+      path        : this.#path,
       lastModified: this.lastModified,
-      start: this.#start + start,
-      size: end - start
+      start       : this.#start + start,
+      size        : end - start,
     })
   }
 
-  async* stream(): AsyncGenerator<Buffer, void, undefined> {
+  async *stream(): AsyncGenerator<Buffer, void, undefined> {
     const {mtimeMs} = await stat(this.#path)
 
     if (mtimeMs > this.lastModified) {
       // eslint-disable-next-line @typescript-eslint/no-throw-literal
-      throw new DOMException(MESSAGE, "NotReadableError")
+      throw new DOMException(MESSAGE, 'NotReadableError')
     }
 
     if (this.size) {
       yield* createReadStream(this.#path, {
         start: this.#start,
-        end: this.#start + this.size - 1
+        end  : this.#start + this.size - 1,
       })
     }
   }
 
   get [Symbol.toStringTag]() {
-    return "File"
+    return 'File'
   }
 }
 
@@ -87,12 +87,13 @@ function createFileFromPath(
   path: string,
   {mtimeMs, size}: Stats,
   filenameOrOptions?: string | FileFromPathOptions,
-  options: FileFromPathOptions = {}
+  options: FileFromPathOptions = {},
 ): File {
   let filename: string | undefined
   if (isPlainObject(filenameOrOptions)) {
     [options, filename] = [filenameOrOptions, undefined]
-  } else {
+  }
+  else {
     filename = filenameOrOptions
   }
 
@@ -103,7 +104,7 @@ function createFileFromPath(
   }
 
   return new File([file], filename, {
-    ...options, lastModified: file.lastModified
+    ...options, lastModified: file.lastModified,
   })
 }
 
@@ -143,7 +144,7 @@ export function fileFromPathSync(
 export function fileFromPathSync(
   path: string,
   filenameOrOptions?: string | FileFromPathOptions,
-  options: FileFromPathOptions = {}
+  options: FileFromPathOptions = {},
 ): File {
   const stats = statSync(path)
 
@@ -189,7 +190,7 @@ export async function fileFromPath(
 export async function fileFromPath(
   path: string,
   filenameOrOptions?: string | FileFromPathOptions,
-  options?: FileFromPathOptions
+  options?: FileFromPathOptions,
 ): Promise<File> {
   const stats = await stat(path)
 

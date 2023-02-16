@@ -1,5 +1,5 @@
-import type {BlobPropertyBag, BlobParts as FileBits} from "./Blob.js"
-import {Blob} from "./Blob.js"
+import type {BlobPropertyBag, BlobParts as FileBits} from './Blob'
+import {Blob} from './Blob'
 
 export interface FileLike {
   /**
@@ -43,8 +43,8 @@ export interface FilePropertyBag extends BlobPropertyBag {
 export class File extends Blob implements FileLike {
   static [Symbol.hasInstance](value: unknown): value is File {
     return value instanceof Blob
-      && value[Symbol.toStringTag] === "File"
-      && typeof (value as File).name === "string"
+      && value[Symbol.toStringTag] === 'File'
+      && typeof (value as File).name === 'string'
   }
 
   /**
@@ -70,7 +70,7 @@ export class File extends Blob implements FileLike {
     if (arguments.length < 2) {
       throw new TypeError(
         "Failed to construct 'File': 2 arguments required, "
-          + `but only ${arguments.length} present.`
+          + `but only ${arguments.length} present.`,
       )
     }
 
@@ -95,7 +95,7 @@ export class File extends Blob implements FileLike {
 
   /* c8 ignore next 3 */
   get webkitRelativePath(): string {
-    return ""
+    return ''
   }
 
   /**
@@ -106,6 +106,6 @@ export class File extends Blob implements FileLike {
   }
 
   get [Symbol.toStringTag](): string {
-    return "File"
+    return 'File'
   }
 }

@@ -3,7 +3,7 @@ const getType = (value: unknown): string => (
 )
 
 function isPlainObject(value: unknown): value is object {
-  if (getType(value) !== "object") {
+  if (getType(value) !== 'object') {
     return false
   }
 

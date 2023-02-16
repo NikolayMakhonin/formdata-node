@@ -1,6 +1,6 @@
 {
   "name": "@flemist/formdata-node",
-  "version": "0.1.4",
+  "version": "5.0.0",
   "description": "",
   "main": "dist/lib/node/index.cjs",
   "module": "dist/lib/node/index.mjs",

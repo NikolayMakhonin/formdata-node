@@ -1,6 +1,6 @@
 {
   "name": "@flemist/formdata-node",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "",
   "main": "dist/lib/node/index.cjs",
   "module": "dist/lib/node/index.mjs",
@@ -48,7 +48,7 @@
   },
   "engines": {
     "node": ">= 14.17",
-    "pnpm": "^7.1.6"
+    "pnpm": ">=7.1.6"
   },
   "repository": {
     "type": "git",
